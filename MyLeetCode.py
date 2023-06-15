@@ -1,4 +1,5 @@
 from typing import List, Optional
+import math
 
 
 # P242 Valid Anagram
@@ -81,38 +82,6 @@ class P198:
         return rob2
 
 
-# Definition for singly-linked list.
-class ListNode:
-    def __init__(self, val=0, next=None):
-        self.val = val
-        self.next = next
-
-
-# P21 Merge Two Sorted Lists
-class P21:
-    def mergeTwoLists(
-        self, list1: Optional[ListNode], list2: Optional[ListNode]
-    ) -> Optional[ListNode]:
-        dummy = ListNode()
-        tail = dummy
-
-        while list1 and list2:
-            if list1.val < list2.val:
-                tail.next = list1
-                list1 = list1.next
-            else:
-                tail.next = list2
-                list2 = list2.next
-            tail = tail.next
-
-        if list1:
-            tail.next = list1
-        elif list2:
-            tail.next = list2
-
-        return dummy.next
-
-
 # P121 Best Time to Buy and Sell Stock
 class P121:
     def maxProfit(self, prices: List[int]) -> int:
@@ -167,50 +136,6 @@ class P70:
         return one
 
 
-# P206 Reverse Linked List
-class P206:
-    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
-        # recursive T O(n), M O(n)
-
-        if not head:
-            return None
-
-        newHead = head
-        if head.next:
-            newHead = self.reverseList(head.next)
-            head.next.next = head
-        head.next = None
-
-        return newHead
-
-
-# Definition for a binary tree node.
-class TreeNode:
-    def __init__(self, val=0, left=None, right=None):
-        self.val = val
-        self.left = left
-        self.right = right
-
-
-# P543 Diameter of Binary Tree
-class P543:
-    def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:
-        self.dfs(root)
-        return self.diameter
-
-    diameter = 0
-
-    def dfs(self, root):
-        if not root:
-            return 0
-        left = self.dfs(root.left)
-        right = self.dfs(root.right)
-        self.diameter = max(self.diameter, left + right)
-
-        # plus 1 means plus this node
-        return 1 + max(left, right)
-
-
 # P20 Valid Parentheses
 class P20:
     def isValid(self, s: str) -> bool:
@@ -231,47 +156,63 @@ class P20:
         return True if not stack else False
 
 
-# P234 Palindrome Linked List
-class P234:
-    def isPalindrome(self, head: Optional[ListNode]) -> bool:
-        fast = head
-        slow = head
+# P7 Reverse Integer
+class P7:
+    def reverse(self, x: int) -> int:
+        # Integer.MIN_VALUE = -2147483648 (end with -8)
+        # Integer.MAX_VALUE = 2147483647 (end with 7)
 
-        # find middle (slow)
-        while fast and fast.next:
-            fast = fast.next.next
-            slow = slow.next
+        MIN = -2147483648  # -2^31
+        MIN_1 = MIN // 10
+        MIN_2 = MIN % 10
+        MAX = 2147483647  #  2^31 - 1
+        MAX_1 = MAX // 10
+        MAX_2 = MAX % 10
 
-        # reverse second half
-        prev = None
-        while slow:
-            tmp = slow.next
-            slow.next = prev
-            prev = slow
-            slow = tmp
+        res = 0
+        while x:
+            digit = int(math.fmod(x, 10))  # (python dumb) -1 %  10 = 9
+            x = int(x / 10)  # (python dumb) -1 // 10 = -1
 
-        # check palindrome
-        left, right = head, prev
-        while right:
-            if left.val != right.val:
-                return False
-            left = left.next
-            right = right.next
+            if res < MIN_1 or (res == MIN_1 and digit <= MIN_2):
+                return 0
+            if res > MAX_1 or (res == MAX_1 and digit >= MAX_2):
+                return 0
+            res = res * 10 + digit
 
-        return True
+        return res
 
 
-# P226  Invert Binary Tree
-class P226:
-    def invertTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
-        if not root:
-            return None
+# P35 Search Insert Position
+class P35:
+    def searchInsert(self, nums: List[int], target: int) -> int:
+        # log(n)
+        l, r = 0, len(nums) - 1
 
-        # swap the children
-        tmp = root.left
-        root.left = root.right
-        root.right = tmp
+        while l <= r:
+            mid = (l + r) // 2
 
-        self.invertTree(root.left)
-        self.invertTree(root.right)
-        return root
+            if target == nums[mid]:
+                return mid
+
+            if target > nums[mid]:
+                l = mid + 1
+            else:
+                r = mid - 1
+
+        # edge case: target = 1, [2]
+        return l
+
+
+# P26 Remove Duplicates from Sorted Array
+class P26:
+    def removeDuplicates(self, nums: List[int]) -> int:
+        l = 1
+
+        for r in range(1, len(nums)):
+            # if meet a new unique number
+            if nums[r] != nums[r - 1]:
+                nums[l] = nums[r]
+                l += 1
+
+        return l
