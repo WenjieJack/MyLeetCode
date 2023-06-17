@@ -1,5 +1,6 @@
 from typing import List, Optional
 import math
+import heapq
 
 
 # P242 Valid Anagram
@@ -216,3 +217,146 @@ class P26:
                 l += 1
 
         return l
+
+
+# P263 Ugly Number
+class P263:
+    def isUgly(self, n: int) -> bool:
+        if n <= 0:
+            return False
+
+        for p in [2, 3, 5]:
+            while n % p == 0:
+                n = n // p
+
+        # return if n is divisible by 2,3,5
+        return n == 1
+
+
+# P27 Remove Element
+class P27:
+    def removeElement(self, nums: List[int], val: int) -> int:
+        k = 0
+
+        for i in range(len(nums)):
+            if nums[i] != val:
+                nums[k] = nums[i]
+                k += 1
+
+        return k
+
+
+# P929 Unique Email Addresses
+class P929:
+    def numUniqueEmails(self, emails: List[str]) -> int:
+        unique = set()
+
+        # e is each email address
+        for e in emails:
+            i = 0
+            local = ""  # the local string
+            while e[i] not in ["@", "+"]:
+                if e[i] != ".":
+                    local += e[i]
+                i += 1
+
+            while e[i] != "@":
+                i += 1
+
+            domain = e[i + 1 :]
+            unique.add((local, domain))
+
+        return len(unique)
+
+
+# P746 Min Cost Climbing Stairs
+class P746:
+    def minCostClimbingStairs(self, cost: List[int]) -> int:
+        # the top is one more from the array
+        cost.append(0)
+
+        for i in range(len(cost) - 3, -1, -1):
+            cost[i] += min(cost[i + 1], cost[i + 2])
+
+        return min(cost[0], cost[1])
+
+
+# P125 Valid Palindrome
+class P125:
+    def isPalindrome(self, s: str) -> bool:
+        l, r = 0, len(s) - 1
+
+        while l < r:
+            while l < r and not self.alphaNum(s[l]):
+                l += 1
+            while r > l and not self.alphaNum(s[r]):
+                r -= 1
+
+            if s[l].lower() != s[r].lower():
+                return False
+            l, r = l + 1, r - 1
+
+        return True
+
+    def alphaNum(cls, c):
+        return (
+            (ord("A") <= ord(c) <= ord("Z"))
+            or (ord("a") <= ord(c) <= ord("z"))
+            or (ord("0") <= ord(c) <= ord("9"))
+        )
+
+
+# P205 Isomorphic Strings
+# s = "egg", t = "add" true
+class P205:
+    def isIsomorphic(self, s: str, t: str) -> bool:
+        mapST, mapTS = {}, {}
+
+        for i in range(len(s)):
+            c1, c2 = s[i], t[i]
+
+            if (c1 in mapST and mapST[c1] != c2) or (c2 in mapTS and mapTS[c2] != c1):
+                return False
+            mapST[c1] = c2
+            mapTS[c2] = c1
+
+        return True
+
+
+# P191 Number of 1 Bits
+class P191:
+    def hammingWeight(self, n: int) -> int:
+        res = 0
+        while n != 0:
+            n = n & (n - 1)
+            res += 1
+        return res
+
+
+# P217 Contains Duplicate
+class P217:
+    def containsDuplicate(self, nums: List[int]) -> bool:
+        hashset = set()
+
+        for n in nums:
+            if n in hashset:
+                return True
+            hashset.add(n)
+
+        return False
+
+
+# P703 Kth Largest Element in a Stream
+# Heap queue algorithm (a.k.a. priority queue), min-heap
+class P703:
+    def __init__(self, k: int, nums: List[int]):
+        self.minHeap, self.k = nums, k
+        heapq.heapify(self.minHeap)
+        while len(self.minHeap) > k:
+            heapq.heappop(self.minHeap)
+
+    def add(self, val: int) -> int:
+        heapq.heappush(self.minHeap, val)
+        if len(self.minHeap) > self.k:
+            heapq.heappop(self.minHeap)
+        return self.minHeap[0]
